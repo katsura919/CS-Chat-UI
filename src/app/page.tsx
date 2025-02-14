@@ -21,36 +21,44 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
+  console.log(messages)
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-
+  
     const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage]; // Include new message
+  
+    setMessages(updatedMessages);
     setInput("");
     setLoading(true);
     setError(null);
-
+  
     try {
-      const response = await axios.post("http://localhost:5000/api/ask/chat", { query: input });
+      const response = await axios.post("http://localhost:5000/api/ask/chat", {
+        query: input,
+        history: updatedMessages, // Pass chat history
+      });
+  
       const aiMessage: Message = {
         id: response.data.id, // Assuming backend returns an ID
         role: "ai",
         content: response.data.answer.trim(),
         feedback: null,
       };
+  
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error("Error fetching response:", error);
       setError("Oops! Something went wrong. Please try again.");
     }
-
+  
     setLoading(false);
   };
+  
 
   const sendFeedback = async (chatId: string, feedback: boolean) => {
     try {
