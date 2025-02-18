@@ -38,7 +38,7 @@ export default function ChatPage() {
     setError(null);
   
     try {
-      const response = await axios.post("http://localhost:5000/api/ask/chat", {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/ask/chat`, {
         query: input,
         history: updatedMessages, // Pass chat history
       });
@@ -62,7 +62,7 @@ export default function ChatPage() {
 
   const sendFeedback = async (chatId: string, feedback: boolean) => {
     try {
-      await axios.post("http://localhost:5000/api/feedback", { chatId, action: feedback ? "like" : "dislike" });
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/feedback`, { chatId, action: feedback ? "like" : "dislike" });
       setMessages((prev) =>
         prev.map((msg) => (msg.id === chatId ? { ...msg, feedback } : msg))
       );
